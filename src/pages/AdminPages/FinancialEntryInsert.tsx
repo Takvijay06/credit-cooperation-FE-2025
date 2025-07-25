@@ -1,0 +1,247 @@
+import React, { useState } from "react";
+import { useDispatch } from "react-redux";
+import { FilePlus, Calendar, User, DollarSign, Info } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+
+import { Layout } from "../../components/Layout";
+import {
+  Button,
+  ErrorMessage,
+  InputWithIcon,
+  Select,
+} from "../../components/UI";
+import { insertFinancialEntry } from "../../store/slices/financeSlice";
+import { AppDispatch } from "../../store";
+import { routes } from "../../routes";
+import { monthOptions, yearOptions } from "../../common/constants";
+
+const InsertFinancialEntriesPage: React.FC = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
+
+  const [formData, setFormData] = useState({
+    serialNumber: "",
+    month: new Date().toLocaleString("default", { month: "long" }),
+    year: new Date().getFullYear().toString(),
+    loanTaken: "0",
+    collection: "1000",
+    fine: "0",
+    instalment: "0",
+  });
+
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [error, setError] = useState<string | null>(null);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+    if (!formData.serialNumber.trim())
+      newErrors.serialNumber = "Serial Number is required";
+    if (!formData.month.trim()) newErrors.month = "Month is required";
+    if (!formData.year.trim()) newErrors.year = "Year is required";
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+
+    if (!validateForm()) return;
+
+    try {
+      const parsedData = {
+        serialNumber: parseInt(formData.serialNumber),
+        month: formData.month,
+        year: parseInt(formData.year),
+        loanTaken: parseInt(formData.loanTaken.toString()) || 0,
+        collection: parseInt(formData.collection.toString()) || 0,
+        fine: parseInt(formData.fine.toString()) || 0,
+        instalment: parseInt(formData.instalment.toString()) || 0,
+      };
+      await dispatch(insertFinancialEntry(parsedData));
+      navigate(routes.adminDashboard);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      setError(err || "Failed to insert entry");
+    }
+  };
+
+  return (
+    <Layout>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-10">
+          {/* Form Section */}
+          <div className="lg:col-span-2 space-y-8">
+            {/* Header */}
+            <div className="flex items-center space-x-4">
+              <div className="h-14 w-14 bg-green-600 rounded-full flex items-center justify-center">
+                <FilePlus className="h-7 w-7 text-white" />
+              </div>
+              <div>
+                <h2 className="text-3xl font-bold text-gray-900">
+                  Insert Financial Entry
+                </h2>
+                <p className="text-gray-600">
+                  Fill in financial details for a member this month.
+                </p>
+              </div>
+            </div>
+
+            {/* Form */}
+            <div className="bg-white p-8 rounded-xl shadow">
+              <form className="space-y-6" onSubmit={handleSubmit}>
+                {error && <ErrorMessage message={error} />}
+
+                {/* Row 1 */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <InputWithIcon
+                    label="Serial Number"
+                    name="serialNumber"
+                    type="number"
+                    value={formData.serialNumber}
+                    onChange={handleChange}
+                    error={errors.serialNumber}
+                    placeholder="e.g. 101"
+                    Icon={User}
+                  />
+                  {/* <InputWithIcon
+                    label="Month"
+                    name="month"
+                    type="text"
+                    value={formData.month}
+                    onChange={handleChange}
+                    error={errors.month}
+                    placeholder="e.g. June"
+                    Icon={Calendar}
+                  /> */}
+                  {/* <Select
+                    label="Month"
+                    name="month"
+                    value={formData.month}
+                    onChange={(e) => handleChange(e)}
+                    options={[...monthOptions]}
+                  /> */}
+                </div>
+
+                {/* Year */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <Select
+                    label="Month"
+                    name="month"
+                    value={formData.month}
+                    onChange={(e) => handleChange(e)}
+                    options={[...monthOptions]}
+                  />
+                  <Select
+                    label="Year"
+                    name="year"
+                    value={formData.year}
+                    onChange={(e) => handleChange(e)}
+                    options={[...yearOptions]}
+                  />
+                </div>
+
+                {/* Row 2 */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <InputWithIcon
+                    label="Loan Taken"
+                    name="loanTaken"
+                    type="number"
+                    value={formData.loanTaken}
+                    onChange={handleChange}
+                    placeholder="e.g. 10000"
+                    Icon={DollarSign}
+                  />
+                  <InputWithIcon
+                    label="Collection"
+                    name="collection"
+                    type="text"
+                    value={formData.collection}
+                    onChange={handleChange}
+                    placeholder="e.g. 5000"
+                    Icon={DollarSign}
+                  />
+                </div>
+
+                {/* Row 3 */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <InputWithIcon
+                    label="Fine"
+                    name="fine"
+                    type="text"
+                    value={formData.fine}
+                    onChange={handleChange}
+                    placeholder="e.g. 100"
+                    Icon={DollarSign}
+                  />
+                  <InputWithIcon
+                    label="Installment"
+                    name="instalment"
+                    type="text"
+                    value={formData.instalment}
+                    onChange={handleChange}
+                    placeholder="e.g. 3000"
+                    Icon={DollarSign}
+                  />
+                  {/* <InputWithIcon
+                    label="Interest"
+                    name="interest"
+                    type="text"
+                    value={formData.interest}
+                    onChange={handleChange}
+                    placeholder="e.g. 200"
+                    Icon={DollarSign}
+                  /> */}
+                </div>
+
+                <Button type="submit" className="w-full mt-4" size="lg">
+                  Submit Entry
+                </Button>
+              </form>
+            </div>
+          </div>
+
+          {/* Sidebar Section */}
+          <div className="space-y-6 mt-0 lg:mt-24">
+            <div className="bg-white p-6 rounded-lg shadow border-l-4 border-green-500">
+              <div className="flex items-start space-x-3">
+                <Info className="h-5 w-5 text-green-600 mt-1" />
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-800">
+                    Entry Guidelines
+                  </h3>
+                  <ul className="mt-2 list-disc pl-5 text-sm text-gray-600 space-y-1">
+                    <li>Use correct Serial Number of the member</li>
+                    <li>Month must be in full form (e.g., "June")</li>
+                    <li>All amounts must be numbers (₹)</li>
+                    <li>Leave 0 for non-applicable fields</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white p-6 rounded-lg shadow">
+              <h4 className="text-md font-medium text-gray-700 mb-2">
+                Quick Tips
+              </h4>
+              <ul className="text-sm text-gray-600 space-y-1 list-disc pl-5">
+                <li>System prevents duplicate entries for same user/month.</li>
+                <li>You can view entries in the Admin Dashboard.</li>
+                <li>For corrections, navigate to user’s month view.</li>
+                <li>Make sure year is correct (default: current year).</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Layout>
+  );
+};
+
+export default InsertFinancialEntriesPage;
