@@ -22,6 +22,10 @@ const InsertFinancialEntriesPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<"manual" | "auto" | "freeze">(
     "auto"
   );
+  const [isLoading, setIsLoading] = useState(false);
+  const [showMessage, setShowMessage] = useState(false);
+  const [isFreezing, setIsFreezing] = useState(false);
+  const [showFreezeMessage, setShowFreezeMessage] = useState(false);
 
   const [formData, setFormData] = useState({
     serialNumber: "",
@@ -129,14 +133,14 @@ const InsertFinancialEntriesPage: React.FC = () => {
                 </div>
                 <div>
                   <h2 className="text-3xl font-bold text-gray-900">
-                    {activeTab === "manual"
-                      ? "Insert Financial Entry"
-                      : "Automate Monthly Entry"}
+                    {activeTab === "manual" && "Insert Financial Entry"}
+                    {activeTab === "auto" && "Automate Monthly Entry"}
+                    {activeTab === "freeze" && "Freeze Monthly Entry"}
                   </h2>
                   <p className="text-gray-600">
-                    {activeTab === "manual"
-                      ? "Fill in financial details for a member this month."
-                      : "Automatically populate financial records for a selected month/year."}
+                    {activeTab === "manual" && "Fill in financial details for a member this month."}
+                    {activeTab === "auto" && "Automatically populate financial records for a selected month/year."}
+                    {activeTab === "freeze" && "Freeze financial records for a selected month/year."}
                   </p>
                 </div>
               </div>
@@ -226,9 +230,9 @@ const InsertFinancialEntriesPage: React.FC = () => {
                 </div>
               )}
 
-              {/*Freeze Entry Tab */}
               {activeTab === "auto" && (
-                <div className="bg-white p-8 rounded-xl shadow space-y-6">
+                <div className="bg-white p-8 rounded-2xl shadow-xl space-y-8">
+                  {/* Month & Year Select */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <Select
                       label="Month"
@@ -245,16 +249,49 @@ const InsertFinancialEntriesPage: React.FC = () => {
                       options={yearOptions}
                     />
                   </div>
-                  <Button
-                    className="w-full"
-                    onClick={() => alert("Auto entry logic goes here")}
+
+                  {/* Progress Bar */}
+                  {isLoading && (
+                    <div className="h-1 w-full bg-gray-200 rounded overflow-hidden">
+                      <div className="h-full bg-gradient-to-r from-blue-400 to-blue-600 animate-progress"></div>
+                    </div>
+                  )}
+
+                  {/* Button */}
+                  <button
+                    disabled={isLoading}
+                    onClick={() => {
+                      setIsLoading(true);
+                      setShowMessage(false);
+                      setTimeout(() => {
+                        setIsLoading(false);
+                        setShowMessage(true);
+                        setTimeout(() => setShowMessage(false), 5000);
+                      }, 2000);
+                    }}
+                    className={`w-full py-3 px-6 text-white text-lg font-semibold rounded-xl transition-all duration-300
+        ${
+          isLoading
+            ? "bg-blue-300 cursor-not-allowed"
+            : "bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 shadow-md hover:shadow-lg"
+        }
+      `}
                   >
-                    Generate Auto Entries
-                  </Button>
+                    {isLoading ? "Generating..." : "Generate Auto Entries"}
+                  </button>
+
+                  {/* Message */}
+                  {showMessage && (
+                    <div className="text-green-600 font-medium text-center transition-opacity duration-300">
+                      Auto entries generated successfully!
+                    </div>
+                  )}
                 </div>
               )}
+
               {activeTab === "freeze" && (
-                <div className="bg-white p-8 rounded-xl shadow space-y-6">
+                <div className="bg-white p-8 rounded-2xl shadow-xl space-y-8">
+                  {/* Select Fields */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <Select
                       label="Month"
@@ -271,12 +308,43 @@ const InsertFinancialEntriesPage: React.FC = () => {
                       options={yearOptions}
                     />
                   </div>
-                  <Button
-                    className="w-full"
-                    onClick={() => alert("Freeze entry logic goes here")}
+
+                  {/* Progress Bar */}
+                  {isFreezing && (
+                    <div className="h-1 w-full bg-gray-200 rounded overflow-hidden">
+                      <div className="h-full bg-gradient-to-r from-blue-400 to-blue-600 animate-progress"></div>
+                    </div>
+                  )}
+
+                  {/* Button */}
+                  <button
+                    disabled={isFreezing}
+                    onClick={() => {
+                      setIsFreezing(true);
+                      setShowFreezeMessage(false);
+                      setTimeout(() => {
+                        setIsFreezing(false);
+                        setShowFreezeMessage(true);
+                        setTimeout(() => setShowFreezeMessage(false), 5000);
+                      }, 2000);
+                    }}
+                    className={`w-full py-3 px-6 text-white text-lg font-semibold rounded-xl transition-all duration-300
+        ${
+          isFreezing
+            ? "bg-blue-300 cursor-not-allowed"
+            : "bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 shadow-md hover:shadow-lg"
+        }
+      `}
                   >
-                    Freeze Entries
-                  </Button>
+                    {isFreezing ? "Freezing..." : "❄️ Freeze Entries"}
+                  </button>
+
+                  {/* Message */}
+                  {showFreezeMessage && (
+                    <div className="text-green-600 font-medium text-center transition-opacity duration-300">
+                      Entries frozen successfully!
+                    </div>
+                  )}
                 </div>
               )}
             </div>
