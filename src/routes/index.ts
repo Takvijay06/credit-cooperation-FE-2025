@@ -8,6 +8,8 @@ export const routes = {
   adminDashboard: "/admin/dashboard",
   userDashboard: "/dashboard",
   insertUserEntry:"/user/entry",
+  usersLoan:"/users/loan",
   adminPendingApprovals: "/admin/pending-approvals",
-  financialDetailsPerMonth:"/financial-details/month/:id"
+  financialDetailsPerMonth:"/financial-details/month/:id",
+  financialDetailsEditPerMonth:"/financial-details-edit/month/:id"
 };

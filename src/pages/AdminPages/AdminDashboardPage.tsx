@@ -6,6 +6,7 @@ import {
   ArrowLeft,
   Filter,
   Eye,
+  Pen,
   ChevronLeft,
   ChevronRight,
   Search,
@@ -27,7 +28,7 @@ import { FinancialEntry } from "../../types";
 const AdminDashboardPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-  const { users, totalUsers, currentPage, isLoading, error } = useSelector(
+  const { totalUsers, currentPage, isLoading, error } = useSelector(
     (state: RootState) => state.admin
   );
   const { financialYears, financialEntries } = useSelector(
@@ -48,12 +49,12 @@ const AdminDashboardPage: React.FC = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    const params = {
-      page: currentPage,
-      limit: itemsPerPage,
-      ...(filters.year && { year: parseInt(filters.year) }),
-      ...(filters.month && { month: parseInt(filters.month) }),
-    };
+    // const params = {
+    //   page: currentPage,
+    //   limit: itemsPerPage,
+    //   ...(filters.year && { year: parseInt(filters.year) }),
+    //   ...(filters.month && { month: parseInt(filters.month) }),
+    // };
     dispatch(
       fetchFinancialEntries({ year: filters.year, month: filters.month })
     );
@@ -70,6 +71,12 @@ const AdminDashboardPage: React.FC = () => {
 
   const handleViewUser = (entry: FinancialEntry) => {
     navigate(`/financial-details/month/${entry.serialNumber}`, {
+      state: { entry },
+    });
+  };
+
+  const handleEditUserEntity = (entry: FinancialEntry) => {
+    navigate(`/financial-details-edit/month/${entry.serialNumber}`, {
       state: { entry },
     });
   };
@@ -94,12 +101,13 @@ const AdminDashboardPage: React.FC = () => {
     { value: "December", label: "December" },
   ];
 
-  const filteredUsers = users.filter(
-    (user) =>
-      user.fullName.toLowerCase().includes(filters.search.toLowerCase()) ||
-      user.email.toLowerCase().includes(filters.search.toLowerCase()) ||
-      user.serialNumber.toLowerCase().includes(filters.search.toLowerCase())
-  );
+  const filteredEntries = financialEntries.filter((entry) => {
+    const search = filters.search.toLowerCase();
+    return (
+      entry.fullName?.toLowerCase().includes(search) ||
+      entry.serialNumber?.toString().includes(search)
+    );
+  });
 
   const handleViewMonth = (entry: FinancialEntry) => {
     // navigate(`/financial-details/month/${entry.serialNumber}`, {
@@ -109,6 +117,35 @@ const AdminDashboardPage: React.FC = () => {
       state: { entry },
     });
   };
+
+  let count = 1;
+  const chunkedSums = [];
+  for (let i = 0; i < filteredEntries.length; i += 4) {
+    const chunk = filteredEntries.slice(i, i + 4);
+    const sum = chunk.reduce(
+      (acc, curr) => {
+        acc.loanTaken += curr.loanTaken || 0;
+        acc.collection += curr.collection || 0;
+        acc.fine += curr.fine || 0;
+        acc.interest += curr.interest || 0;
+        acc.instalment += curr.instalment || 0;
+        acc.total += curr.total || 0;
+        acc.pendingLoan += curr.pendingLoan || 0;
+        return acc;
+      },
+      {
+        label: `Page ${count++}`,
+        loanTaken: 0,
+        collection: 0,
+        fine: 0,
+        interest: 0,
+        instalment: 0,
+        total: 0,
+        pendingLoan: 0,
+      }
+    );
+    chunkedSums.push(sum);
+  }
 
   return (
     <Layout>
@@ -231,13 +268,16 @@ const AdminDashboardPage: React.FC = () => {
                         Pending Loan
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Actions
+                        View
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Edit
                       </th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {financialEntries &&
-                      financialEntries.map((user) => (
+                    {filteredEntries &&
+                      filteredEntries.map((user) => (
                         <tr key={user.id} className="hover:bg-gray-50">
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                             {user.serialNumber}
@@ -288,6 +328,32 @@ const AdminDashboardPage: React.FC = () => {
                               <Eye className="h-4 w-4" />
                               <span>View</span>
                             </button>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium relative group">
+                            <button
+                              onClick={() =>
+                                handleEditUserEntity({
+                                  ...user,
+                                  year: Number(filters.year),
+                                })
+                              }
+                              disabled={user.isFreezed}
+                              className={`flex items-center space-x-1 ${
+                                user.isFreezed
+                                  ? "text-gray-400 cursor-pointer"
+                                  : "text-green-600 hover:text-green-900"
+                              }`}
+                            >
+                              <Pen className="h-4 w-4" />
+                              <span>Edit</span>
+                            </button>
+
+                            {/* Tooltip for disabled */}
+                            {user.isFreezed && (
+                              <div className="absolute bottom-full left-0 mb-2 w-max max-w-xs text-xs text-white bg-gray-800 px-2 py-1 rounded shadow-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-100">
+                                Entry frozen
+                              </div>
+                            )}
                           </td>
                         </tr>
                       ))}
@@ -355,7 +421,43 @@ const AdminDashboardPage: React.FC = () => {
             )}
           </>
         )}
-        
+        {chunkedSums.length > 0 && (
+          <div className="mt-8 bg-white p-4 rounded shadow">
+            <h3 className="text-lg font-semibold mb-4">
+              Page Summary (40 rows/page)
+            </h3>
+            <table className="min-w-full table-auto border border-gray-300">
+              <thead className="bg-gray-100">
+                <tr>
+                  <th className="px-4 py-2 border">Group</th>
+                  <th className="px-4 py-2 border">Loan Taken</th>
+                  <th className="px-4 py-2 border">Collection</th>
+                  <th className="px-4 py-2 border">Fine</th>
+                  <th className="px-4 py-2 border">Interest</th>
+                  <th className="px-4 py-2 border">Instalment</th>
+                  <th className="px-4 py-2 border">Total</th>
+                  <th className="px-4 py-2 border">Pending Loan</th>
+                </tr>
+              </thead>
+              <tbody>
+                {chunkedSums.map((sum, idx) => (
+                  <tr key={idx} className="text-center">
+                    <td className="px-4 py-2 border font-medium">
+                      {sum.label}
+                    </td>
+                    <td className="px-4 py-2 border">{sum.loanTaken}</td>
+                    <td className="px-4 py-2 border">{sum.collection}</td>
+                    <td className="px-4 py-2 border">{sum.fine}</td>
+                    <td className="px-4 py-2 border">{sum.interest}</td>
+                    <td className="px-4 py-2 border">{sum.instalment}</td>
+                    <td className="px-4 py-2 border">{sum.total}</td>
+                    <td className="px-4 py-2 border">{sum.pendingLoan}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </Layout>
   );

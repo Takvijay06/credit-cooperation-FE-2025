@@ -20,6 +20,12 @@ export interface UserRequest {
   email: string;
 }
 
+export interface LoanUserRequest {
+  serialNumber: string;
+  fullName: string;
+  loanTaken: string;
+}
+
 export interface FinancialYear {
   id: string;
   year: number;
@@ -40,6 +46,8 @@ export interface FinancialEntry {
   fine: number;
   instalment: number;
   total: number;
+  status:string;
+  isFreezed:boolean;
   pendingLoan: number;
 }
 
@@ -62,8 +70,9 @@ export interface AuthState {
 export interface FinanceState {
   financialYears: FinancialYear[];
   financialEntries: FinancialEntry[];
-  selectedYear: number | null;
-  selectedMonth: number | null;
+  usersLoan: LoanUserRequest[];
+  selectedYear: string | null;
+  selectedMonth: string | null;
   isLoading: boolean;
   error: string | null;
 }

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
-import { FilePlus, Calendar, User, DollarSign, Info } from "lucide-react";
+import { FilePlus, User, DollarSign, Info, Settings } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 import { Layout } from "../../components/Layout";
@@ -19,6 +19,10 @@ const InsertFinancialEntriesPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
+  const [activeTab, setActiveTab] = useState<"manual" | "auto" | "freeze">(
+    "auto"
+  );
+
   const [formData, setFormData] = useState({
     serialNumber: "",
     month: new Date().toLocaleString("default", { month: "long" }),
@@ -32,7 +36,9 @@ const InsertFinancialEntriesPage: React.FC = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [error, setError] = useState<string | null>(null);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -59,14 +65,13 @@ const InsertFinancialEntriesPage: React.FC = () => {
         serialNumber: parseInt(formData.serialNumber),
         month: formData.month,
         year: parseInt(formData.year),
-        loanTaken: parseInt(formData.loanTaken.toString()) || 0,
-        collection: parseInt(formData.collection.toString()) || 0,
-        fine: parseInt(formData.fine.toString()) || 0,
-        instalment: parseInt(formData.instalment.toString()) || 0,
+        loanTaken: parseInt(formData.loanTaken) || 0,
+        collection: parseInt(formData.collection) || 0,
+        fine: parseInt(formData.fine) || 0,
+        instalment: parseInt(formData.instalment) || 0,
       };
       await dispatch(insertFinancialEntry(parsedData));
       navigate(routes.adminDashboard);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       setError(err || "Failed to insert entry");
     }
@@ -75,167 +80,257 @@ const InsertFinancialEntriesPage: React.FC = () => {
   return (
     <Layout>
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-10">
-          {/* Form Section */}
-          <div className="lg:col-span-2 space-y-8">
-            {/* Header */}
-            <div className="flex items-center space-x-4">
-              <div className="h-14 w-14 bg-green-600 rounded-full flex items-center justify-center">
-                <FilePlus className="h-7 w-7 text-white" />
-              </div>
-              <div>
-                <h2 className="text-3xl font-bold text-gray-900">
-                  Insert Financial Entry
-                </h2>
-                <p className="text-gray-600">
-                  Fill in financial details for a member this month.
-                </p>
-              </div>
-            </div>
-
-            {/* Form */}
-            <div className="bg-white p-8 rounded-xl shadow">
-              <form className="space-y-6" onSubmit={handleSubmit}>
-                {error && <ErrorMessage message={error} />}
-
-                {/* Row 1 */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <InputWithIcon
-                    label="Serial Number"
-                    name="serialNumber"
-                    type="number"
-                    value={formData.serialNumber}
-                    onChange={handleChange}
-                    error={errors.serialNumber}
-                    placeholder="e.g. 101"
-                    Icon={User}
-                  />
-                  {/* <InputWithIcon
-                    label="Month"
-                    name="month"
-                    type="text"
-                    value={formData.month}
-                    onChange={handleChange}
-                    error={errors.month}
-                    placeholder="e.g. June"
-                    Icon={Calendar}
-                  /> */}
-                  {/* <Select
-                    label="Month"
-                    name="month"
-                    value={formData.month}
-                    onChange={(e) => handleChange(e)}
-                    options={[...monthOptions]}
-                  /> */}
-                </div>
-
-                {/* Year */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <Select
-                    label="Month"
-                    name="month"
-                    value={formData.month}
-                    onChange={(e) => handleChange(e)}
-                    options={[...monthOptions]}
-                  />
-                  <Select
-                    label="Year"
-                    name="year"
-                    value={formData.year}
-                    onChange={(e) => handleChange(e)}
-                    options={[...yearOptions]}
-                  />
-                </div>
-
-                {/* Row 2 */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <InputWithIcon
-                    label="Loan Taken"
-                    name="loanTaken"
-                    type="number"
-                    value={formData.loanTaken}
-                    onChange={handleChange}
-                    placeholder="e.g. 10000"
-                    Icon={DollarSign}
-                  />
-                  <InputWithIcon
-                    label="Collection"
-                    name="collection"
-                    type="text"
-                    value={formData.collection}
-                    onChange={handleChange}
-                    placeholder="e.g. 5000"
-                    Icon={DollarSign}
-                  />
-                </div>
-
-                {/* Row 3 */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <InputWithIcon
-                    label="Fine"
-                    name="fine"
-                    type="text"
-                    value={formData.fine}
-                    onChange={handleChange}
-                    placeholder="e.g. 100"
-                    Icon={DollarSign}
-                  />
-                  <InputWithIcon
-                    label="Installment"
-                    name="instalment"
-                    type="text"
-                    value={formData.instalment}
-                    onChange={handleChange}
-                    placeholder="e.g. 3000"
-                    Icon={DollarSign}
-                  />
-                  {/* <InputWithIcon
-                    label="Interest"
-                    name="interest"
-                    type="text"
-                    value={formData.interest}
-                    onChange={handleChange}
-                    placeholder="e.g. 200"
-                    Icon={DollarSign}
-                  /> */}
-                </div>
-
-                <Button type="submit" className="w-full mt-4" size="lg">
-                  Submit Entry
-                </Button>
-              </form>
-            </div>
+        <div className="max-w-7xl mx-auto">
+          {/* Tab Switcher */}
+          <div className="flex space-x-4 mb-6">
+            <button
+              className={`px-4 py-2 rounded-t-md font-medium ${
+                activeTab === "auto"
+                  ? "bg-white text-indigo-600 border-b-2 border-indigo-600"
+                  : "bg-gray-200 text-gray-600"
+              }`}
+              onClick={() => setActiveTab("auto")}
+            >
+              Automate Entry
+            </button>
+            <button
+              className={`px-4 py-2 rounded-t-md font-medium ${
+                activeTab === "manual"
+                  ? "bg-white text-indigo-600 border-b-2 border-indigo-600"
+                  : "bg-gray-200 text-gray-600"
+              }`}
+              onClick={() => setActiveTab("manual")}
+            >
+              Insert Entry
+            </button>
+            <button
+              className={`px-4 py-2 rounded-t-md font-medium ${
+                activeTab === "freeze"
+                  ? "bg-white text-indigo-600 border-b-2 border-indigo-600"
+                  : "bg-gray-200 text-gray-600"
+              }`}
+              onClick={() => setActiveTab("freeze")}
+            >
+              Freeze Entries
+            </button>
           </div>
 
-          {/* Sidebar Section */}
-          <div className="space-y-6 mt-0 lg:mt-24">
-            <div className="bg-white p-6 rounded-lg shadow border-l-4 border-green-500">
-              <div className="flex items-start space-x-3">
-                <Info className="h-5 w-5 text-green-600 mt-1" />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+            {/* Main Section */}
+            <div className="lg:col-span-2 space-y-8">
+              {/* Header */}
+              <div className="flex items-center space-x-4">
+                <div className="h-14 w-14 bg-green-600 rounded-full flex items-center justify-center">
+                  {activeTab === "manual" ? (
+                    <FilePlus className="h-7 w-7 text-white" />
+                  ) : (
+                    <Settings className="h-7 w-7 text-white" />
+                  )}
+                </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-800">
-                    Entry Guidelines
-                  </h3>
-                  <ul className="mt-2 list-disc pl-5 text-sm text-gray-600 space-y-1">
-                    <li>Use correct Serial Number of the member</li>
-                    <li>Month must be in full form (e.g., "June")</li>
-                    <li>All amounts must be numbers (₹)</li>
-                    <li>Leave 0 for non-applicable fields</li>
-                  </ul>
+                  <h2 className="text-3xl font-bold text-gray-900">
+                    {activeTab === "manual"
+                      ? "Insert Financial Entry"
+                      : "Automate Monthly Entry"}
+                  </h2>
+                  <p className="text-gray-600">
+                    {activeTab === "manual"
+                      ? "Fill in financial details for a member this month."
+                      : "Automatically populate financial records for a selected month/year."}
+                  </p>
                 </div>
               </div>
+
+              {/* Manual Entry Form */}
+              {activeTab === "manual" && (
+                <div className="bg-white p-8 rounded-xl shadow">
+                  <form className="space-y-6" onSubmit={handleSubmit}>
+                    {error && <ErrorMessage message={error} />}
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <InputWithIcon
+                        label="Serial Number"
+                        name="serialNumber"
+                        type="number"
+                        value={formData.serialNumber}
+                        onChange={handleChange}
+                        error={errors.serialNumber}
+                        placeholder="e.g. 101"
+                        Icon={User}
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <Select
+                        label="Month"
+                        name="month"
+                        value={formData.month}
+                        onChange={handleChange}
+                        options={monthOptions}
+                      />
+                      <Select
+                        label="Year"
+                        name="year"
+                        value={formData.year}
+                        onChange={handleChange}
+                        options={yearOptions}
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <InputWithIcon
+                        label="Loan Taken"
+                        name="loanTaken"
+                        type="number"
+                        value={formData.loanTaken}
+                        onChange={handleChange}
+                        placeholder="e.g. 10000"
+                        Icon={DollarSign}
+                      />
+                      <InputWithIcon
+                        label="Collection"
+                        name="collection"
+                        type="text"
+                        value={formData.collection}
+                        onChange={handleChange}
+                        placeholder="e.g. 5000"
+                        Icon={DollarSign}
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <InputWithIcon
+                        label="Fine"
+                        name="fine"
+                        type="text"
+                        value={formData.fine}
+                        onChange={handleChange}
+                        placeholder="e.g. 100"
+                        Icon={DollarSign}
+                      />
+                      <InputWithIcon
+                        label="Installment"
+                        name="instalment"
+                        type="text"
+                        value={formData.instalment}
+                        onChange={handleChange}
+                        placeholder="e.g. 3000"
+                        Icon={DollarSign}
+                      />
+                    </div>
+
+                    <Button type="submit" className="w-full mt-4" size="lg">
+                      Submit Entry
+                    </Button>
+                  </form>
+                </div>
+              )}
+
+              {/*Freeze Entry Tab */}
+              {activeTab === "auto" && (
+                <div className="bg-white p-8 rounded-xl shadow space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <Select
+                      label="Month"
+                      name="month"
+                      value={formData.month}
+                      onChange={handleChange}
+                      options={monthOptions}
+                    />
+                    <Select
+                      label="Year"
+                      name="year"
+                      value={formData.year}
+                      onChange={handleChange}
+                      options={yearOptions}
+                    />
+                  </div>
+                  <Button
+                    className="w-full"
+                    onClick={() => alert("Auto entry logic goes here")}
+                  >
+                    Generate Auto Entries
+                  </Button>
+                </div>
+              )}
+              {activeTab === "freeze" && (
+                <div className="bg-white p-8 rounded-xl shadow space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <Select
+                      label="Month"
+                      name="month"
+                      value={formData.month}
+                      onChange={handleChange}
+                      options={monthOptions}
+                    />
+                    <Select
+                      label="Year"
+                      name="year"
+                      value={formData.year}
+                      onChange={handleChange}
+                      options={yearOptions}
+                    />
+                  </div>
+                  <Button
+                    className="w-full"
+                    onClick={() => alert("Freeze entry logic goes here")}
+                  >
+                    Freeze Entries
+                  </Button>
+                </div>
+              )}
             </div>
 
-            <div className="bg-white p-6 rounded-lg shadow">
-              <h4 className="text-md font-medium text-gray-700 mb-2">
-                Quick Tips
-              </h4>
-              <ul className="text-sm text-gray-600 space-y-1 list-disc pl-5">
-                <li>System prevents duplicate entries for same user/month.</li>
-                <li>You can view entries in the Admin Dashboard.</li>
-                <li>For corrections, navigate to user’s month view.</li>
-                <li>Make sure year is correct (default: current year).</li>
-              </ul>
+            {/* Sidebar Section */}
+            <div className="space-y-6 mt-0 lg:mt-24">
+              <div className="bg-white p-6 rounded-lg shadow border-l-4 border-green-500">
+                <div className="flex items-start space-x-3">
+                  <Info className="h-5 w-5 text-green-600 mt-1" />
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-800">
+                      {activeTab === "manual"
+                        ? "Entry Guidelines"
+                        : activeTab === "auto"
+                        ? "Auto Entry Info"
+                        : "Freeze Entities Info"}
+                    </h3>
+                    <ul className="mt-2 list-disc pl-5 text-sm text-gray-600 space-y-1">
+                      {activeTab === "manual" && (
+                        <>
+                          <li>Use correct Serial Number of the member</li>
+                          <li>Month must be in full form (e.g., "June")</li>
+                          <li>All amounts must be numbers (₹)</li>
+                          <li>Leave 0 for non-applicable fields</li>
+                        </>
+                      )}
+                      {activeTab === "auto" && (
+                        <>
+                          <li>
+                            This will auto-generate default entries for each
+                            user
+                          </li>
+                          <li>Use only once per month/year</li>
+                          <li>Defaults can be overridden manually later</li>
+                          <li>Make sure month/year is correct</li>
+                        </>
+                      )}
+                      {activeTab === "freeze" && (
+                        <>
+                          <li>
+                            This will freeze entries for particular month-year
+                          </li>
+                          <li>Use only once per month/year</li>
+                          <li>
+                            No edit entry for particular month/year, if you
+                            perform this operation.
+                          </li>
+                          <li>Make sure month/year is correct</li>
+                        </>
+                      )}
+                    </ul>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

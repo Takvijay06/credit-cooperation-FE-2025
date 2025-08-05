@@ -4,7 +4,7 @@ import { User, APIResponse, PaginationParams, UserRequest } from "../types";
 const APIRoutes = {
   pendingUserApproval: "/admin/pending-approvals",
   getUserDetails: "/admin/users",
-  approveUserRequest: "/admin/approve",
+  approveUserRequest: "/admin/approve"
 };
 
 export const adminService = {

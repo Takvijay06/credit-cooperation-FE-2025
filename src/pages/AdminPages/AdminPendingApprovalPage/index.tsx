@@ -24,6 +24,11 @@ const AdminPendingApprovalPage: React.FC = () => {
     await dispatch(approveUser(userId));
   };
 
+  const handleRemove = async (userId: string) => {
+    //await dispatch(approveUser(userId));
+    console.log("user id", userId);
+  };
+
   return (
     <Layout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -55,6 +60,7 @@ const AdminPendingApprovalPage: React.FC = () => {
             users={pendingUsers}
             isLoading={isLoading}
             onApprove={handleApprove}
+            onRemove={handleRemove}
           />
         ) : (
           <NoUserRequests />

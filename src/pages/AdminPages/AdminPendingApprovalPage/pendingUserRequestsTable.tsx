@@ -13,12 +13,14 @@ interface Props {
   users: PendingUser[];
   isLoading: boolean;
   onApprove: (userId: string) => void;
+  onRemove: (userId: string) => void;
 }
 
 export const PendingUserRequestsTable: React.FC<Props> = ({
   users,
   isLoading,
   onApprove,
+  onRemove
 }) => {
   return (
     <div className="bg-white rounded-lg shadow overflow-hidden">
@@ -32,7 +34,7 @@ export const PendingUserRequestsTable: React.FC<Props> = ({
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr key={"heading"}>
-              {["Serial Number", "Full Name", "Email", "Actions"].map(
+              {["Serial Number", "Full Name", "Email", "Positve-Action", "Negative-Action"].map(
                 (head) => (
                   <th
                     key={head}
@@ -75,6 +77,17 @@ export const PendingUserRequestsTable: React.FC<Props> = ({
                   >
                     <Check className="h-4 w-4 mr-2" />
                     Approve
+                  </Button>
+                </td>
+                <td className="px-6 py-4 text-sm font-medium">
+                  <Button
+                    variant="danger"
+                    size="sm"
+                    onClick={() => onRemove(user.serialNumber)}
+                    disabled={isLoading}
+                  >
+                    <Check className="h-4 w-4 mr-2" />
+                    Delete
                   </Button>
                 </td>
               </tr>

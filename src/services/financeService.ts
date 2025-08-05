@@ -3,10 +3,10 @@ import {
   FinancialYear,
   FinancialEntry,
   APIResponse,
-  PaginationParams,
   FinancialInsertEntry,
   UserFinancialData,
   UserFinancialParams,
+  LoanUserRequest,
 } from "../types";
 
 interface YearMonth {
@@ -38,4 +38,9 @@ export const financeService = {
       "/admin/financial-entry",
       insertEntrydata
     ),
+
+  getLoanUsers: (params: YearMonth) =>
+    api.get<APIResponse<{ users: LoanUserRequest[] }>>("/admin/loan-users", {
+      params,
+    }),
 };

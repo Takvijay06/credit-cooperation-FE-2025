@@ -17,6 +17,8 @@ import AdminDashboardPage from "../pages/AdminPages/AdminDashboardPage";
 import AdminPendingApprovalPage from "../pages/AdminPages/AdminPendingApprovalPage";
 import InsertFinancialEntriesPage from "../pages/AdminPages/FinancialEntryInsert";
 import { routes } from ".";
+import EditFinancialDetails from "../pages/AdminPages/EditFinancialDetails";
+import UsersLoanPerMonth from "../pages/AdminPages/UsersLoanPerMonth";
 
 export const AppRoutes: React.FC = () => {
   const { isAuthenticated, isAdmin } = useAuth();
@@ -34,12 +36,17 @@ export const AppRoutes: React.FC = () => {
       path: routes.financialDetailsPerMonth,
       element: <UserFinancialMonthPage />,
     },
+    {
+      path: routes.financialDetailsEditPerMonth,
+      element: <EditFinancialDetails />,
+    },
   ];
 
   const adminRoutes = [
     { path: routes.adminDashboard, element: <AdminDashboardPage /> },
     { path: routes.adminPendingApprovals, element: <AdminPendingApprovalPage /> },
     { path: routes.insertUserEntry, element: <InsertFinancialEntriesPage /> },
+    { path: routes.usersLoan, element: <UsersLoanPerMonth /> },
   ];
 
   return (
