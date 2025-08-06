@@ -39,6 +39,7 @@ const AdminDashboardPage: React.FC = () => {
     year: "2024",
     month: "March",
     search: "",
+    status: "pending",
   });
 
   const itemsPerPage = 40;
@@ -104,10 +105,16 @@ const AdminDashboardPage: React.FC = () => {
   const filteredEntries = Array.isArray(financialEntries)
     ? financialEntries.filter((entry) => {
         const search = filters.search.toLowerCase();
-        return (
+        const matchesSearch =
           entry.fullName?.toLowerCase().includes(search) ||
-          entry.serialNumber?.toString().includes(search)
-        );
+          entry.serialNumber?.toString().includes(search);
+
+        const matchesStatus =
+          filters.status === "pending"
+            ? entry.status !== "deposit"
+            : entry.status === "deposit";
+
+        return matchesSearch && matchesStatus;
       })
     : [];
 
@@ -122,8 +129,8 @@ const AdminDashboardPage: React.FC = () => {
 
   let count = 1;
   const chunkedSums = [];
-  for (let i = 0; i < filteredEntries.length; i += 4) {
-    const chunk = filteredEntries.slice(i, i + 4);
+  for (let i = 0; i < financialEntries.length; i += 4) {
+    const chunk = financialEntries.slice(i, i + 4);
     const sum = chunk.reduce(
       (acc, curr) => {
         acc.loanTaken += curr.loanTaken || 0;
@@ -148,6 +155,13 @@ const AdminDashboardPage: React.FC = () => {
     );
     chunkedSums.push(sum);
   }
+
+  const toggleStatus = () => {
+    setFilters((prev) => ({
+      ...prev,
+      status: prev.status === "pending" ? "deposit" : "pending",
+    }));
+  };
 
   return (
     <Layout>
@@ -189,7 +203,7 @@ const AdminDashboardPage: React.FC = () => {
                 options={[
                   { value: "2024", label: "2024" },
                   { value: "2025", label: "2025" },
-                   { value: "2026", label: "2026" },
+                  { value: "2026", label: "2026" },
                   ...yearOptions,
                 ]}
               />
@@ -215,6 +229,32 @@ const AdminDashboardPage: React.FC = () => {
                   />
                 </div>
               </div>
+
+              {/* Toggle Button */}
+              <div className="md:col-span-4 flex items-center space-x-3 mt-4">
+                <span className="text-sm font-medium text-gray-700">
+                  Status:
+                </span>
+                <button
+                  onClick={toggleStatus}
+                  className={`relative inline-flex items-center h-6 rounded-full w-14 transition-colors duration-300 focus:outline-none ${
+                    filters.status === "deposit"
+                      ? "bg-green-500"
+                      : "bg-gray-300"
+                  }`}
+                >
+                  <span
+                    className={`inline-block w-6 h-6 transform bg-white rounded-full shadow-md transition-transform duration-300 ${
+                      filters.status === "deposit"
+                        ? "translate-x-8"
+                        : "translate-x-0"
+                    }`}
+                  />
+                </button>
+                <span className="text-sm text-gray-600 capitalize">
+                  {filters.status}-{filteredEntries.length}
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -239,7 +279,7 @@ const AdminDashboardPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="overflow-x-auto">
+              <div className="max-h-[600px] overflow-y-auto">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
