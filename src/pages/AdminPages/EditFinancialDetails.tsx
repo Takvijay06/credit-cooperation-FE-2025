@@ -13,10 +13,14 @@ import Button from "../../components/UI/Button";
 import { FinancialEntry } from "../../types";
 import { useAuth } from "../../hooks";
 import { routes } from "../../routes";
+import { useDispatch } from "react-redux";
+import { editFinancialEntry } from "../../store/slices/financeSlice";
+import { AppDispatch } from "../../store";
 
 const UserEntityEditMonthPage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
   const { isAdmin } = useAuth();
   const entry = location.state?.entry as FinancialEntry;
 
@@ -35,7 +39,7 @@ const UserEntityEditMonthPage: React.FC = () => {
       icon: DollarSign,
       color: "text-green-600",
       bgColor: "bg-green-100",
-      isDisable: true,
+      isDisable: false,
     },
     {
       label: "Fine",
@@ -112,6 +116,33 @@ const UserEntityEditMonthPage: React.FC = () => {
     navigate(routes.adminDashboard);
   };
 
+  const onEditEntryClick = async () => {
+    const parsedData: any = {
+      serialNumber: parseInt(entry.serialNumber),
+      month: entry.month,
+      year: entry.year,
+    };
+
+    if (editableData[0].value !== entry.loanTaken) {
+      parsedData.loanTaken = Number(editableData[0].value);
+    }
+
+     if (editableData[1].value !== entry.collection) {
+      parsedData.collection = Number(editableData[1].value);
+    }
+
+    if (editableData[2].value !== entry.fine) {
+      parsedData.fine = Number(editableData[2].value);
+    }
+
+    if (editableData[3].value !== entry.instalment) {
+      parsedData.instalment = Number(editableData[3].value);
+    }
+
+    await dispatch(editFinancialEntry(parsedData));
+    navigate(routes.adminDashboard);
+  };
+
   return (
     <Layout>
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
@@ -168,7 +199,16 @@ const UserEntityEditMonthPage: React.FC = () => {
               </div>
             );
           })}
+
           <div className="col-span-1 sm:col-span-2 flex justify-center">
+            <Button
+              type="submit"
+              size="lg"
+              className="px-20 py-4 text-xl font-semibold mr-4"
+              onClick={onEditEntryClick}
+            >
+              Edit Entry
+            </Button>
             <Button
               type="submit"
               size="lg"

@@ -46,8 +46,8 @@ export interface FinancialEntry {
   fine: number;
   instalment: number;
   total: number;
-  status:string;
-  isFreezed:boolean;
+  status: string;
+  isFreezed: boolean;
   pendingLoan: number;
 }
 
@@ -59,6 +59,16 @@ export interface FinancialInsertEntry {
   collection: number;
   fine?: number;
   instalment: number;
+}
+
+export interface FinancialEditEntry {
+  serialNumber: number;
+  month: string;
+  year: number;
+  collection?: number;
+  loanTaken?: number;
+  fine?: number;
+  instalment?: number;
 }
 
 export interface AuthState {

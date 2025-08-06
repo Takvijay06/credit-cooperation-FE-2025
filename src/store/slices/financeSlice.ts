@@ -5,6 +5,7 @@ import {
   FinancialEntry,
   FinancialInsertEntry,
   UserFinancialParams,
+  FinancialEditEntry,
 } from "../../types";
 import { financeService } from "../../services/financeService";
 
@@ -63,7 +64,7 @@ export const fetchUserFinancialData = createAsyncThunk(
 );
 
 export const automateUsersFinancialEntriesInsertion = createAsyncThunk(
-  "finance/fetchUserFinancialData",
+  "finance/automateUsersFinancialEntriesInsertion",
   async (params: YearMonth, { rejectWithValue }) => {
     try {
       const response = await financeService.insertUserEntriesAutomate(params);
@@ -86,6 +87,21 @@ export const insertFinancialEntry = createAsyncThunk(
     } catch (error: unknown) {
       const err = error as { response?: { data?: { message?: string } } };
       return rejectWithValue(err.response?.data?.message || "Insert failed");
+    }
+  }
+);
+
+export const editFinancialEntry = createAsyncThunk(
+  "financial/editEntry",
+  async (entryData: FinancialEditEntry, { rejectWithValue }) => {
+    try {
+      // TODO: remove this console.log in production
+      console.log("entryData", entryData);
+      const response = await financeService.editEntry(entryData);
+      return response.data;
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      return rejectWithValue(err.response?.data?.message || "Edit failed");
     }
   }
 );

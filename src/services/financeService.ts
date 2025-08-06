@@ -7,6 +7,7 @@ import {
   UserFinancialData,
   UserFinancialParams,
   LoanUserRequest,
+  FinancialEditEntry,
 } from "../types";
 
 interface YearMonth {
@@ -39,13 +40,19 @@ export const financeService = {
       insertEntrydata
     ),
 
+  editEntry: (editEntrydata: FinancialEditEntry) =>
+    api.put<APIResponse<{ message: string }>>(
+      "/admin/financial-entry",
+      editEntrydata
+    ),
+
   getLoanUsers: (params: YearMonth) =>
     api.get<APIResponse<{ users: LoanUserRequest[] }>>("/admin/loan-users", {
-      params
+      params,
     }),
 
   insertUserEntriesAutomate: (params: YearMonth) =>
     api.post<APIResponse<{ message: string }>>("/admin/financial-entry-auto", {
-      ...params
+      ...params,
     }),
 };
