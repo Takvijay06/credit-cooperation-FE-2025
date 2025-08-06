@@ -7,6 +7,7 @@ import {
   TrendingDown,
   TrendingUp,
   Percent,
+  PlusCircle,
 } from "lucide-react";
 import Layout from "../../components/Layout/Layout";
 import Button from "../../components/UI/Button";
@@ -14,7 +15,10 @@ import { FinancialEntry } from "../../types";
 import { useAuth } from "../../hooks";
 import { routes } from "../../routes";
 import { useDispatch } from "react-redux";
-import { editFinancialEntry } from "../../store/slices/financeSlice";
+import {
+  depositFinancialEntry,
+  editFinancialEntry,
+} from "../../store/slices/financeSlice";
 import { AppDispatch } from "../../store";
 
 const UserEntityEditMonthPage: React.FC = () => {
@@ -23,6 +27,8 @@ const UserEntityEditMonthPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { isAdmin } = useAuth();
   const entry = location.state?.entry as FinancialEntry;
+
+  const [showDeposit, setShowDeposit] = useState(false); // 🔁 Toggle state
 
   const financialData = [
     {
@@ -111,8 +117,14 @@ const UserEntityEditMonthPage: React.FC = () => {
 
   const monthName = entry.month;
 
-  const onFillSocietyClick = () => {
-    //Call edit API here
+  const onFillSocietyClick = async () => {
+    await dispatch(
+      depositFinancialEntry({
+        serialNumber: parseInt(entry.serialNumber),
+        month: entry.month,
+        year: entry.year,
+      })
+    );
     navigate(routes.adminDashboard);
   };
 
@@ -127,7 +139,7 @@ const UserEntityEditMonthPage: React.FC = () => {
       parsedData.loanTaken = Number(editableData[0].value);
     }
 
-     if (editableData[1].value !== entry.collection) {
+    if (editableData[1].value !== entry.collection) {
       parsedData.collection = Number(editableData[1].value);
     }
 
@@ -146,6 +158,7 @@ const UserEntityEditMonthPage: React.FC = () => {
   return (
     <Layout>
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+        {/* Back Button */}
         <Button
           variant="secondary"
           onClick={() =>
@@ -157,6 +170,7 @@ const UserEntityEditMonthPage: React.FC = () => {
           Back to Dashboard
         </Button>
 
+        {/* Header Info */}
         <div className="flex items-center space-x-4">
           <Calendar className="h-8 w-8 text-blue-600" />
           <div>
@@ -167,6 +181,22 @@ const UserEntityEditMonthPage: React.FC = () => {
               Serial Number: {entry.serialNumber} | {entry.fullName}
             </p>
           </div>
+        </div>
+
+        {/* Financial Grid */}
+        {/* Toggle and Optional Deposit Button */}
+        <div className="flex items-center justify-between bg-gray-50 p-4 rounded-md shadow-md">
+          <label className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              checked={showDeposit}
+              onChange={() => setShowDeposit(!showDeposit)}
+              className="form-checkbox h-5 w-5 text-blue-600"
+            />
+            <span className="text-sm font-medium text-gray-700">
+              Check Entry, show Fill Socity Button
+            </span>
+          </label>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -209,17 +239,20 @@ const UserEntityEditMonthPage: React.FC = () => {
             >
               Edit Entry
             </Button>
-            <Button
-              type="submit"
-              size="lg"
-              className="px-20 py-4 text-xl font-semibold"
-              onClick={onFillSocietyClick}
-            >
-              Fill Society
-            </Button>
+            {showDeposit && (
+              <Button
+                type="submit"
+                size="lg"
+                className="px-20 py-4 text-xl font-semibold"
+                onClick={onFillSocietyClick}
+              >
+                Fill Society
+              </Button>
+            )}
           </div>
         </div>
 
+        {/* Pending Loan Alert */}
         {entry.pendingLoan > 0 && (
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 flex items-start space-x-3">
             <TrendingDown className="h-5 w-5 text-yellow-500 mt-1" />

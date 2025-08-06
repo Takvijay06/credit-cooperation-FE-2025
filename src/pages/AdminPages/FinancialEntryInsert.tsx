@@ -12,6 +12,7 @@ import {
 } from "../../components/UI";
 import {
   automateUsersFinancialEntriesInsertion,
+  freezeUsersFinancialEntries,
   insertFinancialEntry,
 } from "../../store/slices/financeSlice";
 import { AppDispatch } from "../../store";
@@ -98,6 +99,22 @@ const InsertFinancialEntriesPage: React.FC = () => {
       setError(err || "Failed to insert entry");
     }
   };
+
+   const handleFreezeEntriesSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+
+    try {
+      const parsedData = {
+        month: formData.month,
+        year: formData.year,
+      };
+      await dispatch(freezeUsersFinancialEntries(parsedData));
+    } catch (err: any) {
+      setError(err || "Failed to insert entry");
+    }
+  };
+
 
   return (
     <Layout>
@@ -341,12 +358,13 @@ const InsertFinancialEntriesPage: React.FC = () => {
                   {/* Button */}
                   <button
                     disabled={isFreezing}
-                    onClick={() => {
+                    onClick={(e) => {
                       setIsFreezing(true);
                       setShowFreezeMessage(false);
                       setTimeout(() => {
                         setIsFreezing(false);
                         setShowFreezeMessage(true);
+                        handleFreezeEntriesSubmit(e);
                         setTimeout(() => setShowFreezeMessage(false), 5000);
                       }, 2000);
                     }}

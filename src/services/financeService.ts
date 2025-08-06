@@ -46,6 +46,12 @@ export const financeService = {
       editEntrydata
     ),
 
+  depositEntry: (depositEntrydata: FinancialEditEntry) =>
+    api.patch<APIResponse<{ message: string }>>(
+      "/admin/financial-entry",
+      depositEntrydata
+    ),
+
   getLoanUsers: (params: YearMonth) =>
     api.get<APIResponse<{ users: LoanUserRequest[] }>>("/admin/loan-users", {
       params,
@@ -53,6 +59,11 @@ export const financeService = {
 
   insertUserEntriesAutomate: (params: YearMonth) =>
     api.post<APIResponse<{ message: string }>>("/admin/financial-entry-auto", {
+      ...params,
+    }),
+
+    freezeUsersEntries: (params: YearMonth) =>
+    api.put<APIResponse<{ message: string }>>("/admin/freeze/financial-entries", {
       ...params,
     }),
 };

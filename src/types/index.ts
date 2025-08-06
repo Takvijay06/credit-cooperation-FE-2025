@@ -71,6 +71,13 @@ export interface FinancialEditEntry {
   instalment?: number;
 }
 
+export interface DepositFinancialEntry {
+  serialNumber: number;
+  month: string;
+  year: number;
+}
+
+
 export interface AuthState {
   token: string | null;
   isLoading: boolean;

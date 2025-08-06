@@ -6,6 +6,7 @@ import {
   FinancialInsertEntry,
   UserFinancialParams,
   FinancialEditEntry,
+  DepositFinancialEntry,
 } from "../../types";
 import { financeService } from "../../services/financeService";
 
@@ -76,6 +77,19 @@ export const automateUsersFinancialEntriesInsertion = createAsyncThunk(
   }
 );
 
+export const freezeUsersFinancialEntries = createAsyncThunk(
+  "finance/freezeUsersFinancialEntries",
+  async (params: YearMonth, { rejectWithValue }) => {
+    try {
+      const response = await financeService.freezeUsersEntries(params);
+      return response.data.data;
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      return rejectWithValue(err.response?.data?.message || "Failed to freeze users financial datas for month");
+    }
+  }
+);
+
 export const insertFinancialEntry = createAsyncThunk(
   "financial/insertEntry",
   async (entryData: FinancialInsertEntry, { rejectWithValue }) => {
@@ -98,6 +112,19 @@ export const editFinancialEntry = createAsyncThunk(
       // TODO: remove this console.log in production
       console.log("entryData", entryData);
       const response = await financeService.editEntry(entryData);
+      return response.data;
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      return rejectWithValue(err.response?.data?.message || "Edit failed");
+    }
+  }
+);
+
+export const depositFinancialEntry = createAsyncThunk(
+  "financial/depositEntry",
+  async (depositData: DepositFinancialEntry, { rejectWithValue }) => {
+    try {
+      const response = await financeService.depositEntry(depositData);
       return response.data;
     } catch (error: unknown) {
       const err = error as { response?: { data?: { message?: string } } };
