@@ -62,6 +62,19 @@ export const fetchUserFinancialData = createAsyncThunk(
   }
 );
 
+export const automateUsersFinancialEntriesInsertion = createAsyncThunk(
+  "finance/fetchUserFinancialData",
+  async (params: YearMonth, { rejectWithValue }) => {
+    try {
+      const response = await financeService.insertUserEntriesAutomate(params);
+      return response.data.data;
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      return rejectWithValue(err.response?.data?.message || "Failed to fetch user financial data");
+    }
+  }
+);
+
 export const insertFinancialEntry = createAsyncThunk(
   "financial/insertEntry",
   async (entryData: FinancialInsertEntry, { rejectWithValue }) => {

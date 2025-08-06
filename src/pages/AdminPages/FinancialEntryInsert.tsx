@@ -10,7 +10,10 @@ import {
   InputWithIcon,
   Select,
 } from "../../components/UI";
-import { insertFinancialEntry } from "../../store/slices/financeSlice";
+import {
+  automateUsersFinancialEntriesInsertion,
+  insertFinancialEntry,
+} from "../../store/slices/financeSlice";
 import { AppDispatch } from "../../store";
 import { routes } from "../../routes";
 import { monthOptions, yearOptions } from "../../common/constants";
@@ -81,6 +84,21 @@ const InsertFinancialEntriesPage: React.FC = () => {
     }
   };
 
+  const handleAutoGenerateSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+
+    try {
+      const parsedData = {
+        month: formData.month,
+        year: formData.year,
+      };
+      await dispatch(automateUsersFinancialEntriesInsertion(parsedData));
+    } catch (err: any) {
+      setError(err || "Failed to insert entry");
+    }
+  };
+
   return (
     <Layout>
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
@@ -138,9 +156,12 @@ const InsertFinancialEntriesPage: React.FC = () => {
                     {activeTab === "freeze" && "Freeze Monthly Entry"}
                   </h2>
                   <p className="text-gray-600">
-                    {activeTab === "manual" && "Fill in financial details for a member this month."}
-                    {activeTab === "auto" && "Automatically populate financial records for a selected month/year."}
-                    {activeTab === "freeze" && "Freeze financial records for a selected month/year."}
+                    {activeTab === "manual" &&
+                      "Fill in financial details for a member this month."}
+                    {activeTab === "auto" &&
+                      "Automatically populate financial records for a selected month/year."}
+                    {activeTab === "freeze" &&
+                      "Freeze financial records for a selected month/year."}
                   </p>
                 </div>
               </div>
@@ -260,9 +281,10 @@ const InsertFinancialEntriesPage: React.FC = () => {
                   {/* Button */}
                   <button
                     disabled={isLoading}
-                    onClick={() => {
+                    onClick={(e) => {
                       setIsLoading(true);
                       setShowMessage(false);
+                      handleAutoGenerateSubmit(e);
                       setTimeout(() => {
                         setIsLoading(false);
                         setShowMessage(true);

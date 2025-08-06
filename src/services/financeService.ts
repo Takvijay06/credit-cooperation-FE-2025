@@ -41,6 +41,11 @@ export const financeService = {
 
   getLoanUsers: (params: YearMonth) =>
     api.get<APIResponse<{ users: LoanUserRequest[] }>>("/admin/loan-users", {
-      params,
+      params
+    }),
+
+  insertUserEntriesAutomate: (params: YearMonth) =>
+    api.post<APIResponse<{ message: string }>>("/admin/financial-entry-auto", {
+      ...params
     }),
 };

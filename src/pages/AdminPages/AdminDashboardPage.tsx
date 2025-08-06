@@ -101,13 +101,15 @@ const AdminDashboardPage: React.FC = () => {
     { value: "December", label: "December" },
   ];
 
-  const filteredEntries = financialEntries.filter((entry) => {
-    const search = filters.search.toLowerCase();
-    return (
-      entry.fullName?.toLowerCase().includes(search) ||
-      entry.serialNumber?.toString().includes(search)
-    );
-  });
+  const filteredEntries = Array.isArray(financialEntries)
+    ? financialEntries.filter((entry) => {
+        const search = filters.search.toLowerCase();
+        return (
+          entry.fullName?.toLowerCase().includes(search) ||
+          entry.serialNumber?.toString().includes(search)
+        );
+      })
+    : [];
 
   const handleViewMonth = (entry: FinancialEntry) => {
     // navigate(`/financial-details/month/${entry.serialNumber}`, {
@@ -187,6 +189,7 @@ const AdminDashboardPage: React.FC = () => {
                 options={[
                   { value: "2024", label: "2024" },
                   { value: "2025", label: "2025" },
+                   { value: "2026", label: "2026" },
                   ...yearOptions,
                 ]}
               />
