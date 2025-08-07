@@ -35,11 +35,16 @@ const AdminDashboardPage: React.FC = () => {
     (state: RootState) => state.finance
   );
 
-  const [filters, setFilters] = useState({
-    year: "2024",
-    month: "March",
-    search: "",
-    status: "pending",
+  const [filters, setFilters] = useState(() => {
+    const storedFilters = JSON.parse(
+      localStorage.getItem("adminDashboardFilters") || "{}"
+    );
+    return {
+      year: storedFilters.year || "2025",
+      month: storedFilters.month || "July",
+      search: "",
+      status: "pending",
+    };
   });
 
   const itemsPerPage = 40;
@@ -62,8 +67,23 @@ const AdminDashboardPage: React.FC = () => {
   }, [dispatch, currentPage, filters.year, filters.month]);
 
   const handleFilterChange = (field: string, value: string) => {
-    setFilters((prev) => ({ ...prev, [field]: value }));
-    dispatch(setCurrentPage(1));
+    setFilters((prev) => {
+      const updatedFilters = { ...prev, [field]: value };
+
+      localStorage.setItem(
+        "adminDashboardFilters",
+        JSON.stringify({
+          year: field === "year" ? value : prev.year,
+          month: field === "month" ? value : prev.month,
+        })
+      );
+
+      return updatedFilters;
+    });
+
+    if (field === "year" || field === "month") {
+      dispatch(setCurrentPage(1));
+    }
   };
 
   const handlePageChange = (page: number) => {
@@ -129,6 +149,16 @@ const AdminDashboardPage: React.FC = () => {
 
   let count = 1;
   const chunkedSums = [];
+  const grandTotal = {
+    label: "Overall Total",
+    loanTaken: 0,
+    collection: 0,
+    fine: 0,
+    interest: 0,
+    instalment: 0,
+    total: 0,
+    pendingLoan: 0,
+  };
   for (let i = 0; i < financialEntries.length; i += 4) {
     const chunk = financialEntries.slice(i, i + 4);
     const sum = chunk.reduce(
@@ -153,8 +183,17 @@ const AdminDashboardPage: React.FC = () => {
         pendingLoan: 0,
       }
     );
+    grandTotal.loanTaken += sum.loanTaken;
+    grandTotal.collection += sum.collection;
+    grandTotal.fine += sum.fine;
+    grandTotal.interest += sum.interest;
+    grandTotal.instalment += sum.instalment;
+    grandTotal.total += sum.total;
+    grandTotal.pendingLoan += sum.pendingLoan;
+
     chunkedSums.push(sum);
   }
+  chunkedSums.push(grandTotal);
 
   const toggleStatus = () => {
     setFilters((prev) => ({
@@ -281,7 +320,7 @@ const AdminDashboardPage: React.FC = () => {
 
               <div className="max-h-[600px] overflow-y-auto">
                 <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
+                  <thead className="bg-gray-50 sticky top-0 z-10">
                     <tr>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Serial Number
