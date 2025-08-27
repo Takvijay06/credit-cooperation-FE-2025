@@ -1,3 +1,4 @@
+import React from "react";
 import { Info } from "lucide-react";
 import labels from "../../../utils/labels.json";
 
@@ -18,4 +19,4 @@ const Heading: React.FC<{ month: string; year: string }> = ({
   </div>
 );
 
-export default Heading;
+export default React.memo(Heading);

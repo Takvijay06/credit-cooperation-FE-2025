@@ -1,3 +1,4 @@
+import React from "react";
 import { monthOptions, yearOptions } from "../../../common/constants";
 import { Select } from "../../../components/UI";
 import labels from "../../../utils/labels.json";
@@ -23,4 +24,4 @@ const FilterDropdown: React.FC<{
     </div>
   </div>
 );
-export default FilterDropdown;
+export default React.memo(FilterDropdown);

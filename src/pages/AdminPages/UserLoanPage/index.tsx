@@ -1,11 +1,12 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState, lazy, Suspense } from "react";
 import { Layout } from "../../../components/Layout";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../store";
 import { fetchLoanUsers } from "../../../store/slices/financeSlice";
 import Heading from "./heading";
-import FilterDropdown from "./filters";
-import LoanTable from "./loanTable";
+import ShimmerLoader from "../../../components/UI/ShimmerLoader";
+const FilterDropdown = lazy(() => import("./filters"));
+const LoanTable = lazy(() => import("./loanTable"));
 
 const UsersLoanPage: React.FC = () => {
   const date = new Date();
@@ -42,20 +43,24 @@ const UsersLoanPage: React.FC = () => {
             </div>
 
             {/* Filters */}
-            <FilterDropdown filters={filters} onChange={handleFilterChange} />
+            <Suspense fallback={<ShimmerLoader rows={3} />}>
+              <FilterDropdown filters={filters} onChange={handleFilterChange} />
+            </Suspense>
           </div>
 
           {/* Table or No Data */}
-          <LoanTable
-            isLoading={isLoading}
-            loans={usersLoan}
-            month={filters.month}
-            year={filters.year}
-          />
+          <Suspense fallback={<ShimmerLoader rows={8} />}>
+            <LoanTable
+              isLoading={isLoading}
+              loans={usersLoan}
+              month={filters.month}
+              year={filters.year}
+            />
+          </Suspense>
         </div>
       </div>
     </Layout>
   );
 };
 
-export default UsersLoanPage;
+export default React.memo(UsersLoanPage);
