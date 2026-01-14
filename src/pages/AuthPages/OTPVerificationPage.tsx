@@ -34,7 +34,7 @@ const OTPVerificationPage: React.FC = () => {
 
     const result = await dispatch(verifyOTP({ email, otp }));
     if (verifyOTP.fulfilled.match(result)) {
-      navigate(routes.userNotification);
+      navigate(routes.signUp);
     }
   };
 

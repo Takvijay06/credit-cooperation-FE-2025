@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { store } from '../store';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api/v1';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://credit-cooperation-2025.onrender.com/api/v1';
 
 export const api = axios.create({
   baseURL: API_BASE_URL,

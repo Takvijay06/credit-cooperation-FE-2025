@@ -6,8 +6,8 @@ export const useSignupForm = () => {
   const [formData, setFormData] = useState<FormData>({
     serialNumber: "",
     fullName: "",
-    email: "",
-    password: "",
+    email: "@gmail.com",
+    password: "vj@123",
     phoneNumber: "",
     emergencyPerson: "",
     emergencyContact: "",
@@ -35,7 +35,7 @@ export const useSignupForm = () => {
     if (
       formData.phoneNumber &&
       !/^\d{10}$/.test(formData.phoneNumber.replace(/\D/g, ""))
-    ) {
+    ) {   
       newErrors.phoneNumber = "Phone number must be 10 digits";
     }
 

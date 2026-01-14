@@ -21,9 +21,9 @@ const SignupPage: React.FC = () => {
     if (!validate()) return;
 
     const result = await dispatch(signup(formData));
-    if (signup.fulfilled.match(result)) {
-      navigate(routes.verifyOtp, { state: { email: formData.email } });
-    }
+    // if (signup.fulfilled.match(result)) {
+    //   navigate(routes.verifyOtp, { state: { email: formData.email } });
+    // }
   };
 
   return (

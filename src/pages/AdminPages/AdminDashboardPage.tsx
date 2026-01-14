@@ -159,8 +159,8 @@ const AdminDashboardPage: React.FC = () => {
     total: 0,
     pendingLoan: 0,
   };
-  for (let i = 0; i < financialEntries.length; i += 4) {
-    const chunk = financialEntries.slice(i, i + 4);
+  for (let i = 0; i < financialEntries.length; i += 40) {
+    const chunk = financialEntries.slice(i, i + 40);
     const sum = chunk.reduce(
       (acc, curr) => {
         acc.loanTaken += curr.loanTaken || 0;
