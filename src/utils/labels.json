@@ -1,0 +1,21 @@
+{
+  "header": {
+    "loanPagetitle": "Loan Taken Users in ",
+    "loanPagesubtitle": "View loan details of users for the selected month."
+  },
+  "filters": {
+    "year": "Year",
+    "month": "Month"
+  },
+  "elementValue":{
+    "year": "year",
+    "month": "month"
+  },
+  "loading": {
+    "message": "Loading..."
+  },
+  "table": {
+    "loanPageNoDataFound": "No Data Found",
+    "loanPageNoUsersFound": "No users found with loans for "
+  }
+}
