@@ -124,18 +124,18 @@ const AdminDashboardPage: React.FC = () => {
 
   const filteredEntries = Array.isArray(financialEntries)
     ? financialEntries.filter((entry) => {
-        const search = filters.search.toLowerCase();
-        const matchesSearch =
-          entry.fullName?.toLowerCase().includes(search) ||
-          entry.serialNumber?.toString().includes(search);
+      const search = filters.search.toLowerCase();
+      const matchesSearch =
+        entry.fullName?.toLowerCase().includes(search) ||
+        entry.serialNumber?.toString().includes(search);
 
-        const matchesStatus =
-          filters.status === "pending"
-            ? entry.status !== "deposit"
-            : entry.status === "deposit";
+      const matchesStatus =
+        filters.status === "pending"
+          ? entry.status !== "deposit"
+          : entry.status === "deposit";
 
-        return matchesSearch && matchesStatus;
-      })
+      return matchesSearch && matchesStatus;
+    })
     : [];
 
   const handleViewMonth = (entry: FinancialEntry) => {
@@ -276,18 +276,16 @@ const AdminDashboardPage: React.FC = () => {
                 </span>
                 <button
                   onClick={toggleStatus}
-                  className={`relative inline-flex items-center h-6 rounded-full w-14 transition-colors duration-300 focus:outline-none ${
-                    filters.status === "deposit"
+                  className={`relative inline-flex items-center h-6 rounded-full w-14 transition-colors duration-300 focus:outline-none ${filters.status === "deposit"
                       ? "bg-green-500"
                       : "bg-gray-300"
-                  }`}
+                    }`}
                 >
                   <span
-                    className={`inline-block w-6 h-6 transform bg-white rounded-full shadow-md transition-transform duration-300 ${
-                      filters.status === "deposit"
+                    className={`inline-block w-6 h-6 transform bg-white rounded-full shadow-md transition-transform duration-300 ${filters.status === "deposit"
                         ? "translate-x-8"
                         : "translate-x-0"
-                    }`}
+                      }`}
                   />
                 </button>
                 <span className="text-sm text-gray-600 capitalize">
@@ -318,11 +316,11 @@ const AdminDashboardPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="max-h-[600px] overflow-y-auto">
+              <div className="max-h-[600px] overflow-y-auto overflow-x-auto relative">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50 sticky top-0 z-10">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="sticky left-0 z-20 bg-gray-50 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Serial Number
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -361,7 +359,7 @@ const AdminDashboardPage: React.FC = () => {
                     {filteredEntries &&
                       filteredEntries.map((user) => (
                         <tr key={user.id} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          <td className="sticky left-0 px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                             {user.serialNumber}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
@@ -420,11 +418,10 @@ const AdminDashboardPage: React.FC = () => {
                                 })
                               }
                               disabled={user.isFreezed}
-                              className={`flex items-center space-x-1 ${
-                                user.isFreezed
+                              className={`flex items-center space-x-1 ${user.isFreezed
                                   ? "text-gray-400 cursor-pointer"
                                   : "text-green-600 hover:text-green-900"
-                              }`}
+                                }`}
                             >
                               <Pen className="h-4 w-4" />
                               <span>Edit</span>
@@ -478,11 +475,10 @@ const AdminDashboardPage: React.FC = () => {
                           )}
                           <button
                             onClick={() => handlePageChange(page)}
-                            className={`px-3 py-1 rounded text-sm font-medium ${
-                              currentPage === page
+                            className={`px-3 py-1 rounded text-sm font-medium ${currentPage === page
                                 ? "bg-blue-600 text-white"
                                 : "text-gray-700 hover:bg-gray-100"
-                            }`}
+                              }`}
                           >
                             {page}
                           </button>
@@ -508,36 +504,38 @@ const AdminDashboardPage: React.FC = () => {
             <h3 className="text-lg font-semibold mb-4">
               Page Summary (40 rows/page)
             </h3>
-            <table className="min-w-full table-auto border border-gray-300">
-              <thead className="bg-gray-100">
-                <tr>
-                  <th className="px-4 py-2 border">Group</th>
-                  <th className="px-4 py-2 border">Loan Taken</th>
-                  <th className="px-4 py-2 border">Collection</th>
-                  <th className="px-4 py-2 border">Fine</th>
-                  <th className="px-4 py-2 border">Interest</th>
-                  <th className="px-4 py-2 border">Instalment</th>
-                  <th className="px-4 py-2 border">Total</th>
-                  <th className="px-4 py-2 border">Pending Loan</th>
-                </tr>
-              </thead>
-              <tbody>
-                {chunkedSums.map((sum, idx) => (
-                  <tr key={idx} className="text-center">
-                    <td className="px-4 py-2 border font-medium">
-                      {sum.label}
-                    </td>
-                    <td className="px-4 py-2 border">{sum.loanTaken}</td>
-                    <td className="px-4 py-2 border">{sum.collection}</td>
-                    <td className="px-4 py-2 border">{sum.fine}</td>
-                    <td className="px-4 py-2 border">{sum.interest}</td>
-                    <td className="px-4 py-2 border">{sum.instalment}</td>
-                    <td className="px-4 py-2 border">{sum.total}</td>
-                    <td className="px-4 py-2 border">{sum.pendingLoan}</td>
+            <div className="overflow-x-auto">
+              <table className="min-w-full table-auto border border-gray-300">
+                <thead className="bg-gray-100">
+                  <tr>
+                    <th className="px-4 py-2 border">Group</th>
+                    <th className="px-4 py-2 border">Loan Taken</th>
+                    <th className="px-4 py-2 border">Collection</th>
+                    <th className="px-4 py-2 border">Fine</th>
+                    <th className="px-4 py-2 border">Interest</th>
+                    <th className="px-4 py-2 border">Instalment</th>
+                    <th className="px-4 py-2 border">Total</th>
+                    <th className="px-4 py-2 border">Pending Loan</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {chunkedSums.map((sum, idx) => (
+                    <tr key={idx} className="text-center">
+                      <td className="sticky left-0 z-10 bg-white px-4 py-2 border font-medium">
+                        {sum.label}
+                      </td>
+                      <td className="px-4 py-2 border">{sum.loanTaken}</td>
+                      <td className="px-4 py-2 border">{sum.collection}</td>
+                      <td className="px-4 py-2 border">{sum.fine}</td>
+                      <td className="px-4 py-2 border">{sum.interest}</td>
+                      <td className="px-4 py-2 border">{sum.instalment}</td>
+                      <td className="px-4 py-2 border">{sum.total}</td>
+                      <td className="px-4 py-2 border">{sum.pendingLoan}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
       </div>
