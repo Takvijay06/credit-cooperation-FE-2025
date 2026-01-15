@@ -155,6 +155,21 @@ const UserEntityEditMonthPage: React.FC = () => {
     navigate(routes.adminDashboard);
   };
 
+  const hasChanges = editableData.some((item, index) => {
+    switch (index) {
+      case 0:
+        return item.value !== entry.loanTaken;
+      case 1:
+        return item.value !== entry.collection;
+      case 2:
+        return item.value !== entry.fine;
+      case 3:
+        return item.value !== entry.instalment;
+      default:
+        return false; // non-editable fields
+    }
+  });
+
   return (
     <Layout>
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
@@ -205,16 +220,15 @@ const UserEntityEditMonthPage: React.FC = () => {
             return (
               <div
                 key={item.label}
-                className={`${
-                  item.label !== "Total Amount"
-                    ? "bg-white"
-                    : "bg-blue-300 border-cyan-800"
-                } p-5 rounded-xl shadow-md flex items-center gap-4`}
+                className={`${item.label !== "Total Amount"
+                  ? "bg-white"
+                  : "bg-blue-300 border-cyan-800"
+                  } p-5 rounded-xl shadow-md flex items-center gap-4`}
               >
                 <div className={`p-3 rounded-lg ${item.bgColor}`}>
                   <Icon className={`h-6 w-6 ${item.color}`} />
                 </div>
-                <div className="flex flex-col flex-grow">
+                <div className="flex flex-col flex-grow min-w-0">
                   <label className="text-sm text-gray-600 font-medium mb-1">
                     {item.label}
                   </label>
@@ -223,7 +237,7 @@ const UserEntityEditMonthPage: React.FC = () => {
                     value={item.value}
                     disabled={item.isDisable}
                     onChange={(e) => handleValueChange(index, e.target.value)}
-                    className="text-2xl font-semibold text-center bg-gray-50 text-gray-900 px-4 py-2 rounded-md outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition shadow-sm"
+                    className="w-full min-w-0 text-xl sm:text-2xl font-semibold text-center bg-gray-50 text-gray-900 px-3 py-2 rounded-md outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition shadow-sm"
                   />
                 </div>
               </div>
@@ -236,6 +250,7 @@ const UserEntityEditMonthPage: React.FC = () => {
               size="lg"
               className="px-20 py-4 text-xl font-semibold mr-4"
               onClick={onEditEntryClick}
+              disabled={!hasChanges}
             >
               Edit Entry
             </Button>
